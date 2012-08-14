@@ -6,6 +6,10 @@ I K Stead
 13/08/2012
 """
 
+#TODO: To make this more practical, the tree constructor function should
+# be able to take an iterable and an index in the iterable to use as the 
+# key. Then I can use this for indexing all sorts of things
+
 class Node(object):
     """
     Represent a node in the binary search tree
