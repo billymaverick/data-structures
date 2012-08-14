@@ -16,6 +16,7 @@ class Node(object):
         self.l_child = None
         self.r_child = None
         self.level = level
+        self.discriminator = level % len(data)
 
     def insert(self, data):
         """
@@ -24,7 +25,7 @@ class Node(object):
         Data comparison cycles through data item index 0 to k as tree
         increases depth.
         """
-        d = self.level % len(data) # Discriminator
+        d = self.discriminator # Readability
 
         if data[d] < self.data[d]:
             if not self.l_child:
@@ -40,9 +41,6 @@ class Node(object):
     def inorder(self, fn=None):
         """
         Inorder traversal, performing some function on each node. 
-        
-        Due to the BST property, the resulting enumeration
-        will be in sorted order, from lowest to highest.
         """
         # Visit left child and its subtree
         if self.l_child:
@@ -55,6 +53,28 @@ class Node(object):
             self.r_child.inorder(fn)
         return
 
+    def within_radius(self, point, radius, result=None):
+        """
+        Find all items in the tree within radius of point
+        """
+        d = self.discriminator
+
+        if result is None:
+            result = []
+        
+        if in_circle(point, radius, self.data):
+            result.append(self.data)
+
+        # Check whether any of the points in the subtrees could be
+        # within the circle
+        if point[d] - radius < self.data[d] and self.l_child:
+            self.l_child.within_radius(point, radius, result)
+
+        if point[d] + radius > self.data[d] and self.r_child:
+            self.r_child.within_radius(point, radius, result)
+
+        return result
+
 def kdtree(data_list):
     """
     Create and return a new k-d tree from supplied list of ordinal data
@@ -64,7 +84,32 @@ def kdtree(data_list):
         root.insert(el)
     return root
 
+def distance(a, b):
+    """
+    Return the Euclidean distance between a and b.
+    """
+    k = len(a)
+    dn = []
+    for i in xrange(k):
+        dn.append( (a[i] - b[i])**2 )
+    return sum(dn)**0.5
+
+def in_circle(centre, radius, point):
+    """
+    Determine whether point lies within circle defined by centre & radius.
+
+    Although the function is called in_circle, it works for centre and
+    point arguments of arbitrary dimensions.
+    """
+    if distance(centre, point) > radius:
+        return False
+    else:
+        return True
+
 def __test__():
     point_list = [(40, 45), (15, 70), (70, 10), (69, 50), (66, 85), (85, 90)]
     kd = kdtree(point_list)
     print kd.data, kd.l_child.data, kd.r_child
+
+    wr = kd.within_radius((25,65), 25)
+    print wr
