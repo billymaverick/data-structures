@@ -48,6 +48,19 @@ class Node(object):
             self.r_child.inorder(fn)
         return
 
+    def search(self, key):
+        """
+        Recursively search node and subtree for key value
+        """
+        if self.data == key:
+            return self
+        if key < self.data and self.l_child:
+            return self.l_child.search(key)
+        if key >= self.data and self.r_child:
+            return self.r_child.search(key)
+        
+        return False
+
 def binary_tree(data_list):
     """
     Create a binary tree of nodes from iterable containing ordinal data
@@ -60,3 +73,5 @@ def binary_tree(data_list):
 def __test__():
     data = [37, 24, 42, 7, 2, 40, 42, 32, 120]
     tree = binary_tree(data)
+    x =  tree.search(42)
+    print x.data, x.l_child, x.r_child
